@@ -38,6 +38,7 @@ class Breakout{
         void drawBall();
         void drawBricks();
 
+        void activeMouse(int, int, int, int);
         void passiveMouse(int, int);
         void activeKeyboard(int, int, int);
         void specialActiveKeyboard(int, int, int);

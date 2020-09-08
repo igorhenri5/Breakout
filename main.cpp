@@ -22,9 +22,9 @@ struct timeval tempoInicial, tempoFinal;
 int mouse_x, mouse_y;
 char buffer[64];
 
-// void activeMouse(int button, int state, int x, int y){
-// 	breakout.activeMouse(button, state, x, y);
-// }
+void activeMouse(int button, int state, int x, int y){
+	breakout.activeMouse(button, state, x, y);
+}
 
 void passiveMouse(int x, int y){
     mouse_x = x; 
@@ -61,7 +61,7 @@ void initOpenGLEnvironment(int width, int height){
     glEnable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
-    glClearColor(0.5f, 0.5f, 0.5f, 0.5f); // Set background frame color
+    glClearColor(0.106f, 0.106f, 0.200f, 1.0f); // Set background frame color
     glViewport(0, 0, width, height);
 }
 
@@ -79,6 +79,7 @@ int main(int argc, char **argv){
     initOpenGLEnvironment(WIDTHPX,HEIGHTPX);
 
     glutDisplayFunc(display);
+    glutMouseFunc(activeMouse);
     glutPassiveMotionFunc(passiveMouse);
 	glutKeyboardFunc(activeKeyboard);
 	glutSpecialFunc(specialActiveKeyboard);
