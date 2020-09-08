@@ -129,11 +129,9 @@ void Breakout::initPaddle(){
 void Breakout::initBricks(){
     int brickWidth  = 90;
     int brickHeight = 45;
-    bricks.push_back(new Brick(300,100,brickWidth,brickHeight));
-    bricks.push_back(new Brick(400,100,brickWidth,brickHeight));
-    bricks.push_back(new Brick(500,100,brickWidth,brickHeight));
-    bricks.push_back(new Brick(600,100,brickWidth,brickHeight));
-    bricks.push_back(new Brick(700,100,brickWidth,brickHeight));
+    for(int i=0; i<10; i++){
+        bricks.push_back(new Brick(i*100+5,100,brickWidth,brickHeight));
+    }
 }
 
 void Breakout::initBall(){
