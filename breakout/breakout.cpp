@@ -94,13 +94,32 @@ void Breakout::display(){
 }
 
 void Breakout::update(){
-    //mover tudo e checar colisões      
 
-    //movendo paddle
+//Bola
+    //colisão com as bordas da tela
+        //esquerda-direita
+        if((this->ball->x <= (2*this->ball->radius)) || (this->ball->x >= (this->width - 2*this->ball->radius))){
+            this->ball->velX *= -1;
+        }
+        //cima
+        if((this->ball->y <= (2 * this->ball->radius))){
+            this->ball->velY *= -1;
+        }
+        //baixo
+        if(this->ball->y >= (this->height - 2*this->ball->radius)){
+            //matar a bola
+        }
+
+    //colisão da bola com os tijolos
+        
+    //mover bola
+        this->ball->x += this->ball->velX;
+        this->ball->y += this->ball->velY;    
+
+//Paddle
+    //mover paddle
     GLfloat vel = paddleVelocity(paddle->x, this->mouseX, paddle->width, (GLfloat)width);
-    // if(paddle->x >= 0 && (paddle->x + paddle->width < this->width)){
-        paddle->x += vel;
-    // /} 
+    this->paddle->x += vel;
 }
 
 void Breakout::initPaddle(){
@@ -118,7 +137,7 @@ void Breakout::initBricks(){
 }
 
 void Breakout::initBall(){
-    ball = new Ball(((float)width-10)/2,(float)height*0.9-15.0f,10,1,1);
+    ball = new Ball(((float)width-10)/2,(float)height*0.9-15.0f,10,10,0);
 }
 
 void Breakout::drawPaddle(){
