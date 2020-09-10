@@ -13,7 +13,7 @@
 #include "breakout/breakout.hpp"
 
 #define WIDTHPX  1000
-#define HEIGHTPX 1000
+#define HEIGHTPX 600
 
 Breakout breakout(WIDTHPX,HEIGHTPX);
 

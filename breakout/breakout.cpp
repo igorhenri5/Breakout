@@ -12,18 +12,31 @@
 
 Breakout::Breakout(){
     this->state = 0;
+    this->score = 0;
+    this->gamePaused = true; //Jogo começa pausado
 }
 
 Breakout::Breakout(int width, int height){
     this->state = 0;
+    this->score = 0; 
+    this->gamePaused = true; //Jogo começa pausado
     this->width = width;
     this->height = height;
 }
 
 void Breakout::activeMouse(int button, int state, int x, int y){
     if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
-        std::cout << "Pause/Resume" << std::endl;
-        //pause
+        switch (this->gamePaused) {
+        case true:
+            this->gamePaused = false;
+            std::cout << "RESUME GAME" << std::endl;
+            break;
+
+        case false:
+            this->gamePaused = true;
+            std::cout << "PAUSE GAME" << std::endl;
+            break;
+        }
     }
 }
 
@@ -57,8 +70,9 @@ void Breakout::specialActiveKeyboard(int key, int x, int y){
 
 void Breakout::init(){
     initPaddle();
-    initBricks();
+    //initBricks();
     initBall();
+    initLevel();
     mouseX = 0.0f;
     this->state = 1;
 }
@@ -86,7 +100,9 @@ void Breakout::display(){
 
         case 1:
             draw();
-            update();
+            if (!this->gamePaused) {
+                update();
+            }
             break;        
         default:
             break;
@@ -146,6 +162,23 @@ void Breakout::update(){
         }
 
     //colisão da bola com os tijolos            
+        for (std::vector<Brick*>::iterator it = currentLevel->bricks.begin(); it != currentLevel->bricks.end(); ++it) {
+            if (this->ball->x >= (*it)->x &&
+                this->ball->x <= (*it)->x + (*it)->width) { //Bola está entre as coordenadas X de um Tijolo
+                
+                if ((this->ball->y <= (*it)->y+(*it)->height) &&
+                    (this->ball->y >= (*it)->y)               && (*it)->tangivel) { //Se a bola colide com um tijolo TANGÍVEL
+                    
+                        (*it)->tangivel = false; //Mata o Tijolo deixando ele INTANGÍVEL
+                        this->score += 50; //Aumenta o Score em 50 por tijolo Destruido
+                        this->ball->velY *= -1;
+
+                        //Fazer com que a bola inverta a direção X caso bata na "parede" esquerda ou direita do Tijolo
+                }
+
+            }
+                
+        }
 
     //colisão da bola com o paddle
         // if(this->ball->x >= this->paddle->x && this->ball->x <= this->paddle->x + paddle->width){
@@ -172,19 +205,24 @@ void Breakout::initPaddle(){
     paddle = new Paddle(((float)width-200)/2,(float)height*0.9, 200.0f,10.0f);
 }
 
-void Breakout::initBricks(){
-    int brickWidth  = 90;
-    int brickHeight = 45;
-    //matriz de tijolos 3x10 p/ tela 1000x1000
-    for(int k=1; k<=3; k++){
-        for(int i=0; i<10; i++){
-            bricks.push_back(new Brick(i*100+5,k*50,brickWidth,brickHeight));
-        }
-    }
-}
+//void Breakout::initBricks(){
+//    int brickWidth  = 90;
+//    int brickHeight = 45;
+//    //matriz de tijolos 3x10 p/ tela 1000x1000
+//    for(int k=1; k<=3; k++){
+//        for(int i=0; i<10; i++){
+//            bricks.push_back(new Brick(i*100+5,k*50,brickWidth,brickHeight,1));
+//        }
+//    }
+//}
 
 void Breakout::initBall(){
     ball = new Ball(((float)width-10)/2,(float)height*0.9-15.0f,10,10,10);
+}
+
+void Breakout::initLevel() { //Inicia o Level 
+    std::string layout = "1110220111|1002222001|1011221101|1001221001"; //Especifica quais os tipos de Tijolo fazem parte do Level
+    currentLevel = new Level(layout);
 }
 
 void Breakout::drawPaddle(){
@@ -193,20 +231,8 @@ void Breakout::drawPaddle(){
 }
 
 void Breakout::drawBricks(){
-    for(std::vector<Brick*>::iterator it = bricks.begin(); it != bricks.end(); ++it){
-        // glColor3f(0.91f, 0.008f, 0.475f);
-        glColor3f(0.0f, 1.0f, 0.6f);
-        glRectf((*it)->x, (*it)->y, (*it)->x + (*it)->width, (*it)->y + (*it)->height);
-        
-        glBegin(GL_QUADS);
-        glColor3f(0.0f, 1.0f-0.2f, 0.2f);
-        glVertex2f((*it)->x, (*it)->y);
-        glColor3f(0.0f, 1.0f-0.05f, 0.25f);
-        glVertex2f((*it)->x + (*it)->width, (*it)->y);
-        glColor3f(0.0f, 1.0f-0.15f, 0.45f);
-        glVertex2f((*it)->x + (*it)->width, (*it)->y + (*it)->height);
-        glVertex2f((*it)->x, (*it)->y);
-        glEnd();
+    for(std::vector<Brick*>::iterator it = currentLevel->bricks.begin(); it != currentLevel->bricks.end(); ++it){
+        (*it)->drawBrick();
     }
 }
 
@@ -223,9 +249,22 @@ void Breakout::drawBall(){
     glEnd();   
 }
 
+void Breakout::drawText(float x, float y, std::string text) { //Imprime a stirng nas coordenadas X e Y especificadas
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glRasterPos2f(x, y);
+    glutBitmapString(GLUT_BITMAP_HELVETICA_18, (const unsigned char*)text.c_str());
+}
+
 void Breakout::draw(){
     drawPaddle();
     drawBricks();
     drawBall();
+    
+    drawText(10.0f, 25.0f, std::to_string(this->score)); //Desenha o Score
+
+    if(this->gamePaused) { //Se o jogo estiver pausado, informa o jogador
+        drawText(450.0f, 400.0f, "Jogo Pausado!");
+        drawText(275.0f, 425.0f, "Presisone o Botao Esquerdo do Mouse para Despausar!");
+    }
 }
 

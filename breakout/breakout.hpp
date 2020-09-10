@@ -4,6 +4,7 @@
 #include "../entities/ball.hpp"
 #include "../entities/brick.hpp"
 #include "../entities/paddle.hpp"
+#include "../entities/level.hpp"
 
 #include <vector>
 #include <iostream>
@@ -14,12 +15,14 @@
 
 class Breakout{
     public:
-        int state;
+        int state, score;
+        bool gamePaused;
         int width, height;
         GLfloat mouseX;
-        std::vector<Brick*> bricks;
+        //std::vector<Brick*> bricks;
         Paddle* paddle;
         Ball* ball;
+        Level* currentLevel;
 
         Breakout();
         Breakout(int, int);
@@ -31,12 +34,14 @@ class Breakout{
 
         void initPaddle();
         void initBall();
-        void initBricks();
+        //void initBricks();
+        void initLevel();
 
         void draw();
         void drawPaddle();
         void drawBall();
         void drawBricks();
+        void drawText(float, float, std::string);
 
         void activeMouse(int, int, int, int);
         void passiveMouse(int, int);
