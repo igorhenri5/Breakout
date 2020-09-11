@@ -10,6 +10,7 @@ class Brick{
         bool tangivel;
         int type;
         Brick();
+        Brick(GLfloat,GLfloat,GLfloat,GLfloat);
         Brick(GLfloat,GLfloat,GLfloat,GLfloat, int);
         void drawBrick();
 };

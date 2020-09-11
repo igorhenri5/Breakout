@@ -1,7 +1,4 @@
 #include "Level.hpp"
-#include <vector>
-#include <iostream>
-#include <stdlib.h>
 
 Level::Level() {
 }

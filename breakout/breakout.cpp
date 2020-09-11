@@ -1,11 +1,7 @@
 #include "breakout.hpp"
 
-#include <vector>
 #include <iostream>
-#include <stdlib.h>
 #include <math.h>
-#include <cstdlib>
-#include <GL/freeglut.h>
 
 #define PI 3.14159265
 #define MAXXVEL 10
@@ -122,17 +118,13 @@ GLfloat paddleVelocity(GLfloat pX, GLfloat wX, GLfloat pWidth, GLfloat wWidth){
     //retorna algo no intervalo [-maxVel,maxVel]
     vel = ((wX-paddleCenterX)/maxDistance)*maxVel;
 
-    if(vel>0 && vel<0.334)
-        return 0.334;
+    if(vel>0 && vel<0.333)
+        return 0.333;
 
-    if(vel<0 && vel>-0.334)
-        return -0.334;
+    if(vel<0 && vel>-0.333)
+        return -0.333;
 
     return vel;
-}
-
-GLfloat calcBallXVel(){
-
 }
 
 void Breakout::update(){
@@ -205,17 +197,6 @@ void Breakout::initPaddle(){
     paddle = new Paddle(((float)width-200)/2,(float)height*0.9, 200.0f,10.0f);
 }
 
-//void Breakout::initBricks(){
-//    int brickWidth  = 90;
-//    int brickHeight = 45;
-//    //matriz de tijolos 3x10 p/ tela 1000x1000
-//    for(int k=1; k<=3; k++){
-//        for(int i=0; i<10; i++){
-//            bricks.push_back(new Brick(i*100+5,k*50,brickWidth,brickHeight,1));
-//        }
-//    }
-//}
-
 void Breakout::initBall(){
     ball = new Ball(((float)width-10)/2,(float)height*0.9-15.0f,10,10,10);
 }
@@ -259,9 +240,8 @@ void Breakout::draw(){
     drawPaddle();
     drawBricks();
     drawBall();
-    
     drawText(10.0f, 25.0f, std::to_string(this->score)); //Desenha o Score
-
+    
     if(this->gamePaused) { //Se o jogo estiver pausado, informa o jogador
         drawText(450.0f, 400.0f, "Jogo Pausado!");
         drawText(275.0f, 425.0f, "Presisone o Botao Esquerdo do Mouse para Despausar!");

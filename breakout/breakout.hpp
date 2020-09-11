@@ -2,14 +2,8 @@
 #define __BKOUT__
 
 #include "../entities/ball.hpp"
-#include "../entities/brick.hpp"
 #include "../entities/paddle.hpp"
 #include "../entities/level.hpp"
-
-#include <vector>
-#include <iostream>
-#include <stdlib.h>
-#include <math.h>
 
 #define FRAMETIME 1000/60
 
@@ -19,7 +13,6 @@ class Breakout{
         bool gamePaused;
         int width, height;
         GLfloat mouseX;
-        //std::vector<Brick*> bricks;
         Paddle* paddle;
         Ball* ball;
         Level* currentLevel;
@@ -30,11 +23,9 @@ class Breakout{
         void init();
         void display();
         void update();
-        // void pause();
 
         void initPaddle();
         void initBall();
-        //void initBricks();
         void initLevel();
 
         void draw();

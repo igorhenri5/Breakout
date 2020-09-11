@@ -4,8 +4,7 @@
 #include <GL/freeglut.h>
 #include "brick.hpp"
 #include <vector>
-#include <iostream>
-#include <stdlib.h>
+#include <string>
 
 class Level {
 public:
