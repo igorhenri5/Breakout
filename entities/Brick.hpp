@@ -9,10 +9,12 @@ class Brick{
         GLfloat width, height;
         bool tangivel;
         int type;
+        int hp;
         Brick();
         Brick(GLfloat,GLfloat,GLfloat,GLfloat);
         Brick(GLfloat,GLfloat,GLfloat,GLfloat, int);
         void drawBrick();
+        int takeHit();
 };
 
 #endif

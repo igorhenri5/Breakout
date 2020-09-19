@@ -1,5 +1,4 @@
 #include "breakout.hpp"
-
 #include <iostream>
 #include <math.h>
 
@@ -7,17 +6,13 @@
 #define MAXXVEL 10
 
 Breakout::Breakout(){
-    this->state = 0;
-    this->score = 0;
-    this->gamePaused = true; //Jogo começa pausado
+    init();
 }
 
 Breakout::Breakout(int width, int height){
-    this->state = 0;
-    this->score = 0; 
-    this->gamePaused = true; //Jogo começa pausado
     this->width = width;
     this->height = height;
+    init();
 }
 
 void Breakout::activeMouse(int button, int state, int x, int y){
@@ -54,6 +49,7 @@ void Breakout::activeKeyboard(int key, int x, int  y){
         case 'r':
         case 'R':
             //reset
+            init();
             break;
         default:
             break;
@@ -65,6 +61,9 @@ void Breakout::specialActiveKeyboard(int key, int x, int y){
 }
 
 void Breakout::init(){
+    this->state = 0;
+    this->score = 0; 
+    this->gamePaused = true;
     initPaddle();
     //initBricks();
     initBall();
@@ -99,6 +98,7 @@ void Breakout::display(){
             if (!this->gamePaused) {
                 update();
             }
+            // draw();
             break;        
         default:
             break;
@@ -115,12 +115,12 @@ GLfloat paddleVelocity(GLfloat pX, GLfloat wX, GLfloat pWidth, GLfloat wWidth){
 
     GLfloat paddleCenterX = pX+(pWidth/2);
     GLfloat maxDistance = wWidth-pWidth/2;
-    //retorna algo no intervalo [-maxVel,maxVel]
+
+    // retorna algo no intervalo [-maxVel,maxVel]
     vel = ((wX-paddleCenterX)/maxDistance)*maxVel;
 
     if(vel>0 && vel<0.333)
         return 0.333;
-
     if(vel<0 && vel>-0.333)
         return -0.333;
 
@@ -138,13 +138,67 @@ void Breakout::update(){
     this->paddle->x += vel;
 
 //Colisões
+
+    //colisão da bola com o paddle
+        if( this->ball->y + 2*this->ball->radius > this->paddle->y &&
+            this->ball->y < this->paddle->y &&
+            this->ball->x > (this->paddle->x - this->ball->radius) &&
+            this->ball->x < (this->paddle->x + this->paddle->width + this->ball->radius)){
+            
+            this->ball->velY *= -1;
+            //mudar a velX da bola de acordo com a area do paddle onde ocorreu colisão
+            //calcula a nova velocidade em x com uma função não linear
+            GLfloat paddleCenterX = this->paddle->x+(this->paddle->width/2);
+            GLfloat velX = (this->ball->x - paddleCenterX)/(this->paddle->width/2);
+            if(velX>0)
+                velX = MAXXVEL*sqrt(velX);
+            else
+                velX = -MAXXVEL*sqrt(-velX);                
+            this->ball->velX = velX;
+        }
+
+    //colisão da bola com os tijolos  
+
+        for (std::vector<Brick*>::iterator it = currentLevel->bricks.begin(); it != currentLevel->bricks.end(); ++it){
+            int hit = 0;
+            if ((*it)->tangivel){
+                if( this->ball->x > (*it)->x - this->ball->radius &&
+                    this->ball->x < (*it)->x + (*it)->width + this->ball->radius &&
+                    this->ball->y > (*it)->y - this->ball->radius &&
+                    this->ball->y < (*it)->y + (*it)->height + this->ball->radius){
+                    
+                    if( this->ball->y + this->ball->radius > (*it)->y &&
+                        this->ball->y < (*it)->y + (*it)->height - this->ball->radius){
+                        //hit lateral
+                        this->ball->velX *= -1;
+                        hit = 1;
+                    }else if(   this->ball->x + this->ball->radius > (*it)->x  &&
+                                this->ball->x < (*it)->x + (*it)->width - this->ball->radius){
+                        //hit vertical
+                        this->ball->velY *= -1;
+                        hit = 1;
+                    }else{
+                        //hit na quina
+                        this->ball->velX *= -1;
+                        this->ball->velY *= -1;
+                        hit = 1;
+                    }
+                }
+
+                if(hit){                   
+                   this->score += (*it)->takeHit();
+                }
+            }   
+        }
+
     //colisão com as bordas da tela
         //esquerda-direita
-        if((this->ball->x <= (2*this->ball->radius)) || (this->ball->x >= (this->width - 2*this->ball->radius))){
+        if( (this->ball->x <= (2*this->ball->radius)) || 
+            (this->ball->x >= (this->width - 2*this->ball->radius))){
             this->ball->velX *= -1;
         }
         //cima
-        if((this->ball->y <= (2 * this->ball->radius))){
+        if((this->ball->y <= (2*this->ball->radius))){
             this->ball->velY *= -1;
         }
         //baixo
@@ -153,56 +207,21 @@ void Breakout::update(){
             this->ball->velY *= -1;
         }
 
-    //colisão da bola com os tijolos            
-        for (std::vector<Brick*>::iterator it = currentLevel->bricks.begin(); it != currentLevel->bricks.end(); ++it) {
-            if (this->ball->x >= (*it)->x &&
-                this->ball->x <= (*it)->x + (*it)->width) { //Bola está entre as coordenadas X de um Tijolo
-                
-                if ((this->ball->y <= (*it)->y+(*it)->height) &&
-                    (this->ball->y >= (*it)->y)               && (*it)->tangivel) { //Se a bola colide com um tijolo TANGÍVEL
-                    
-                        (*it)->tangivel = false; //Mata o Tijolo deixando ele INTANGÍVEL
-                        this->score += 50; //Aumenta o Score em 50 por tijolo Destruido
-                        this->ball->velY *= -1;
-
-                        //Fazer com que a bola inverta a direção X caso bata na "parede" esquerda ou direita do Tijolo
-                }
-
-            }
-                
-        }
-
-    //colisão da bola com o paddle
-        // if(this->ball->x >= this->paddle->x && this->ball->x <= this->paddle->x + paddle->width){
-        if( this->ball->x >= this->paddle->x && 
-            this->ball->x <= this->paddle->x + paddle->width){
-            if( (this->paddle->y -this->ball->y -this->ball->radius) < (this->paddle->height) &&
-                (this->paddle->y -this->ball->y -this->ball->radius) > 0){
-                this->ball->velY *= -1;
-                //mudar a velX da bola de acordo com a area do paddle onde ocorreu colisão
-                    //calcula a nova velocidade em x com uma função não linear
-                GLfloat paddleCenterX = this->paddle->x+(this->paddle->width/2);
-                GLfloat velX = (this->ball->x - paddleCenterX)/(this->paddle->width/2);
-                if(velX>0)
-                    velX = MAXXVEL*sqrt(velX);
-                else
-                    velX = -MAXXVEL*sqrt(-velX);                
-                this->ball->velX = velX;
-            }
-        }
 }
-        
 
 void Breakout::initPaddle(){
     paddle = new Paddle(((float)width-200)/2,(float)height*0.9, 200.0f,10.0f);
+    // paddle = new Paddle(0,height, 200.0f,10.0f);
 }
 
 void Breakout::initBall(){
-    ball = new Ball(((float)width-10)/2,(float)height*0.9-15.0f,10,10,10);
+    ball = new Ball(((float)width-10)/2, (float)height*0.9-15.0f, 6, 0, -10);
 }
 
 void Breakout::initLevel() { //Inicia o Level 
-    std::string layout = "1110220111|1002222001|1011221101|1001221001"; //Especifica quais os tipos de Tijolo fazem parte do Level
+    // std::string layout = "1110220111|1002222001|1011221101|1001221001"; //Especifica quais os tipos de Tijolo fazem parte do Level
+    // std::string layout = "11102201111110220111|10022220011002222001|10112211011011221101|10012210011001221001"; //Especifica quais os tipos de Tijolo fazem parte do Level
+    std::string layout = "11102201111110220111|10022220011002222001|10112211011011221101|10012210011001223451"; //Especifica quais os tipos de Tijolo fazem parte do Level
     currentLevel = new Level(layout);
 }
 
@@ -230,7 +249,7 @@ void Breakout::drawBall(){
     glEnd();   
 }
 
-void Breakout::drawText(float x, float y, std::string text) { //Imprime a stirng nas coordenadas X e Y especificadas
+void Breakout::drawText(float x, float y, std::string text) { //Imprime a string nas coordenadas X e Y especificadas
     glColor3f(1.0f, 1.0f, 1.0f);
     glRasterPos2f(x, y);
     glutBitmapString(GLUT_BITMAP_HELVETICA_18, (const unsigned char*)text.c_str());
