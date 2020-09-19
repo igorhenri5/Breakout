@@ -19,8 +19,12 @@ void Breakout::activeMouse(int button, int state, int x, int y){
     if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
         switch (this->gamePaused) {
         case true:
-            this->gamePaused = false;
-            std::cout << "RESUME GAME" << std::endl;
+            if(this->state==2){
+                init();
+            }else{
+                this->gamePaused = false;
+                std::cout << "RESUME GAME" << std::endl;
+            }
             break;
 
         case false:
@@ -61,6 +65,7 @@ void Breakout::specialActiveKeyboard(int key, int x, int y){
 }
 
 void Breakout::init(){
+    this->ballCount = 3;
     this->state = 0;
     this->score = 0; 
     this->gamePaused = true;
@@ -89,17 +94,23 @@ void Breakout::display(){
     glLoadIdentity();
 
     switch(this->state){
-        case 0:
+        case 0: //inicializar
             init();
             break;
 
-        case 1:
+        case 1: //executando
             draw();
             if (!this->gamePaused) {
                 update();
             }
             // draw();
-            break;        
+            break;
+        case 2: //perdi KK
+            draw();
+            if (!this->gamePaused) {
+                update();
+            }
+            break;                
         default:
             break;
     }
@@ -203,8 +214,7 @@ void Breakout::update(){
         }
         //baixo
         if(this->ball->y >= (this->height - 2*this->ball->radius)){
-            //matar a bola
-            this->ball->velY *= -1;
+            resetBall();
         }
 
 }
@@ -261,9 +271,24 @@ void Breakout::draw(){
     drawBall();
     drawText(10.0f, 25.0f, std::to_string(this->score)); //Desenha o Score
     
-    if(this->gamePaused) { //Se o jogo estiver pausado, informa o jogador
-        drawText(450.0f, 400.0f, "Jogo Pausado!");
-        drawText(275.0f, 425.0f, "Presisone o Botao Esquerdo do Mouse para Despausar!");
+    if(this->gamePaused){ //Se o jogo estiver pausado, informa o jogador
+        if(state==2){
+            drawText(450.0f, 400.0f, "PERDEU TUDO");
+            drawText(275.0f, 425.0f, "Presisone o Botao Esquerdo do Mouse para comecar um novo jogo!");
+        }else{
+            drawText(450.0f, 400.0f, "Jogo Pausado!");
+            drawText(275.0f, 425.0f, "Presisone o Botao Esquerdo do Mouse para Despausar!");
+        }
+    }
+}
+
+void Breakout::resetBall(){
+    ballCount--;
+    if(ballCount == 0){
+        this->state = 2;
+        this->gamePaused = true;
+    }else{
+        initBall();
     }
 }
 

@@ -12,11 +12,12 @@ class Breakout{
         int state, score;
         bool gamePaused;
         int width, height;
+        int ballCount;
         GLfloat mouseX;
         Paddle* paddle;
         Ball* ball;
+        // std::vector<Ball*> balls;
         Level* currentLevel;
-
         Breakout();
         Breakout(int, int);
 
@@ -27,6 +28,8 @@ class Breakout{
         void initPaddle();
         void initBall();
         void initLevel();
+
+        void resetBall();
 
         void draw();
         void drawPaddle();
