@@ -4,6 +4,7 @@
 #include "../entities/ball.hpp"
 #include "../entities/paddle.hpp"
 #include "../entities/level.hpp"
+#include "../entities/message.hpp"
 
 #define FRAMETIME 1000/60
 
@@ -18,6 +19,7 @@ class Breakout{
         Ball* ball;
         // std::vector<Ball*> balls;
         Level* currentLevel;
+        std::vector<Message*> messages;
         Breakout();
         Breakout(int, int);
 
@@ -36,7 +38,9 @@ class Breakout{
         void drawBall();
         void drawBricks();
         void drawText(float, float, std::string);
+        void drawMessages();
 
+        void gameInfo();
         void activeMouse(int, int, int, int);
         void passiveMouse(int, int);
         void activeKeyboard(int, int, int);

@@ -15,55 +15,6 @@ Breakout::Breakout(int width, int height){
     init();
 }
 
-void Breakout::activeMouse(int button, int state, int x, int y){
-    if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN){
-        switch (this->gamePaused) {
-        case true:
-            if(this->state==2){
-                init();
-            }else{
-                this->gamePaused = false;
-                std::cout << "RESUME GAME" << std::endl;
-            }
-            break;
-
-        case false:
-            this->gamePaused = true;
-            std::cout << "PAUSE GAME" << std::endl;
-            break;
-        }
-    }
-}
-
-void Breakout::passiveMouse(int x, int y){
-    char buffer[64];
-    snprintf(buffer, sizeof(buffer), "%d", x);
-    glutSetWindowTitle(buffer);
-
-    this->mouseX = (GLfloat)x;
-}
-
-void Breakout::activeKeyboard(int key, int x, int  y){
-    std::cout << "Key pressed:: " << key << std::endl;
-    switch(key){
-        case 'q':
-        case 'Q':
-            //quit
-            exit(1);
-        case 'r':
-        case 'R':
-            //reset
-            init();
-            break;
-        default:
-            break;
-    }
-}
-
-void Breakout::specialActiveKeyboard(int key, int x, int y){
-    std::cout << "Key pressed:: " << key << std::endl;    
-}
-
 void Breakout::init(){
     this->ballCount = 3;
     this->state = 0;
@@ -198,6 +149,10 @@ void Breakout::update(){
 
                 if(hit){                   
                    this->score += (*it)->takeHit();
+                   if ((*it)->type == 4) { //Se for Amarelo, do tipo 4
+                       ballCount++; //Ganha uma vida Extra
+                       messages.push_back(new Message("+1 Vida!!", 180, height));
+                   }
                 }
             }   
         }
@@ -231,8 +186,9 @@ void Breakout::initBall(){
 void Breakout::initLevel() { //Inicia o Level 
     // std::string layout = "1110220111|1002222001|1011221101|1001221001"; //Especifica quais os tipos de Tijolo fazem parte do Level
     // std::string layout = "11102201111110220111|10022220011002222001|10112211011011221101|10012210011001221001"; //Especifica quais os tipos de Tijolo fazem parte do Level
-    std::string layout = "11102201111110220111|10022220011002222001|10112211011011221101|10012210011001223451"; //Especifica quais os tipos de Tijolo fazem parte do Level
-    currentLevel = new Level(layout);
+    // std::string layout = "11102201111110220111|10022220011002222001|10112211011011221101|10012210011001223451"; //Especifica quais os tipos de Tijolo fazem parte do Level
+    std::string layout1 = "55521111555111112555|00024112222211142000|00024444444444442000"; //Level 1 - 3 Linhas
+    currentLevel = new Level(layout1);
 }
 
 void Breakout::drawPaddle(){
@@ -265,11 +221,31 @@ void Breakout::drawText(float x, float y, std::string text) { //Imprime a string
     glutBitmapString(GLUT_BITMAP_HELVETICA_18, (const unsigned char*)text.c_str());
 }
 
+void Breakout::drawMessages() {
+    if (!messages.empty()) {
+        for (std::vector<Message*>::iterator it = messages.begin(); it != messages.end();) {
+            drawText(10.0f, (*it)->posY, (*it)->message);
+            (*it)->posY -= 1;
+            (*it)->timer -= 1;
+
+            if ((*it)->timer <= 0) {
+                if (it != messages.end()) {
+                    it = messages.erase(it);
+                }
+            } else {
+                it++;
+            }
+        }
+    }
+}
+
 void Breakout::draw(){
     drawPaddle();
     drawBricks();
     drawBall();
-    drawText(10.0f, 25.0f, std::to_string(this->score)); //Desenha o Score
+    drawText(10.0f, 25.0f, "Score: " + std::to_string(this->score)); //Desenha o Score
+    drawText(120.0f, 25.0f, "Vidas: " + std::to_string(this->ballCount)); //Desenha a quantidade de Bolotas
+    drawMessages();
     
     if(this->gamePaused){ //Se o jogo estiver pausado, informa o jogador
         if(state==2){
@@ -292,3 +268,69 @@ void Breakout::resetBall(){
     }
 }
 
+void Breakout::gameInfo() {
+    std::cout << "########## GAME INFO ##########" << std::endl;
+    std::cout << "----- PADDLE -----"<< std::endl;
+    std::cout << "PosX: " << paddle->x << std::endl;
+    std::cout << "VelX: " << paddleVelocity(paddle->x, this->mouseX, paddle->width, (GLfloat)width) << std::endl;
+    std::cout << "------ BALL ------" << std::endl;
+    std::cout << "PosX: " << ball->x << std::endl;
+    std::cout << "PosY: " << ball->y << std::endl;
+    std::cout << "VelX: " << ball->velX << std::endl;
+    std::cout << "VelY: " << ball->velY << std::endl;
+}
+
+void Breakout::activeMouse(int button, int state, int x, int y) {
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+        switch (this->gamePaused) {
+        case true:
+            if (this->state == 2) {
+                init();
+            }
+            else {
+                this->gamePaused = false;
+                std::cout << "RESUME GAME" << std::endl;
+            }
+            break;
+
+        case false:
+            this->gamePaused = true;
+            std::cout << "PAUSE GAME" << std::endl;
+            break;
+        }
+    }
+
+    if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
+        this->gamePaused = true;
+        gameInfo();
+    }
+}
+
+void Breakout::passiveMouse(int x, int y) {
+    char buffer[64];
+    snprintf(buffer, sizeof(buffer), "%d", x);
+    glutSetWindowTitle(buffer);
+
+    this->mouseX = (GLfloat)x;
+}
+
+void Breakout::activeKeyboard(int key, int x, int  y) {
+    std::cout << "Key pressed:: " << key << std::endl;
+    switch (key) {
+    case 'q':
+    case 'Q':
+        //quit
+        exit(1);
+    case 'r':
+    case 'R':
+        //reset
+        init();
+        break;
+    default:
+        break;
+    }
+}
+
+void Breakout::specialActiveKeyboard(int key, int x, int y) {
+    std::cout << "Key pressed:: " << key << std::endl;
+}
