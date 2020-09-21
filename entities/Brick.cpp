@@ -138,7 +138,6 @@ int Brick::takeHit(){
             break;
         case 2: //Azul - Decai pra verde
             this->hp -= 1;
-            this->type = 1;
             return 100;
             break;
         case 3: //Vermelho - Dá mais pontos

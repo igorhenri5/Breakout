@@ -16,10 +16,14 @@ Breakout::Breakout(int width, int height){
 }
 
 void Breakout::init(){
+    this->qntLevels = 2;
+    this->levelNumber = 1;
     this->ballCount = 3;
     this->state = 0;
     this->score = 0; 
     this->gamePaused = true;
+    this->changingLevels = false;
+    this->gameEnd = false;
     initPaddle();
     //initBricks();
     initBall();
@@ -149,9 +153,31 @@ void Breakout::update(){
 
                 if(hit){                   
                    this->score += (*it)->takeHit();
-                   if ((*it)->type == 4) { //Se for Amarelo, do tipo 4
+                   switch ((*it)->type) {
+                   case 1:
+                        this->currentLevel->liveBricks--;
+                        break;
+                    
+                   case 2:
+                       (*it)->type = 1;
+                       break;
+
+                   case 3:
+                       this->currentLevel->liveBricks--;
+                       break;
+
+                   case 4: //Se for do Tipo 4, Amarelo
+                       this->currentLevel->liveBricks--;
                        ballCount++; //Ganha uma vida Extra
                        messages.push_back(new Message("+1 Vida!!", 180, height));
+
+                   case 5:
+                       break;
+                   }
+
+                   if (this->currentLevel->liveBricks == 0) {
+                       this->gamePaused = true;
+                       this->changingLevels = true;
                    }
                 }
             }   
@@ -187,8 +213,20 @@ void Breakout::initLevel() { //Inicia o Level
     // std::string layout = "1110220111|1002222001|1011221101|1001221001"; //Especifica quais os tipos de Tijolo fazem parte do Level
     // std::string layout = "11102201111110220111|10022220011002222001|10112211011011221101|10012210011001221001"; //Especifica quais os tipos de Tijolo fazem parte do Level
     // std::string layout = "11102201111110220111|10022220011002222001|10112211011011221101|10012210011001223451"; //Especifica quais os tipos de Tijolo fazem parte do Level
-    std::string layout1 = "55521111555111112555|00024112222211142000|00024444444444442000"; //Level 1 - 3 Linhas
-    currentLevel = new Level(layout1);
+    std::string layout1 = "00000000111100000000|11111000444000011111";
+    std::string layout2 = "00000221555112200000|10033224444442233000";
+    
+    std::cout << "Loading Level: " << this->levelNumber << std::endl;
+    
+    switch (this->levelNumber) {
+    case 1:
+        currentLevel = new Level(layout1);
+        break;
+    case 2:
+        currentLevel = new Level(layout2);
+        break;
+    }
+
 }
 
 void Breakout::drawPaddle(){
@@ -245,15 +283,24 @@ void Breakout::draw(){
     drawBall();
     drawText(10.0f, 25.0f, "Score: " + std::to_string(this->score)); //Desenha o Score
     drawText(120.0f, 25.0f, "Vidas: " + std::to_string(this->ballCount)); //Desenha a quantidade de Bolotas
+    drawText(220.0f, 25.0f, "Tijolos Restantes: " + std::to_string(this->currentLevel->liveBricks)); //Desenha a quantidade de Bolotas
     drawMessages();
     
     if(this->gamePaused){ //Se o jogo estiver pausado, informa o jogador
-        if(state==2){
-            drawText(450.0f, 400.0f, "PERDEU TUDO");
-            drawText(275.0f, 425.0f, "Presisone o Botao Esquerdo do Mouse para comecar um novo jogo!");
-        }else{
-            drawText(450.0f, 400.0f, "Jogo Pausado!");
-            drawText(275.0f, 425.0f, "Presisone o Botao Esquerdo do Mouse para Despausar!");
+        if (this->gameEnd) {
+            drawText(450.0f, 400.0f, "VC ganhou!!!!");
+        } else if (this->changingLevels) {
+            drawText(450.0f, 400.0f, "LEVEL COMPLETO");
+            drawText(275.0f, 425.0f, "Presisone o Botao Esquerdo do Mouse para ir para outro nivel!");
+        } else {
+            if (state == 2) {
+                drawText(450.0f, 400.0f, "PERDEU TUDO");
+                drawText(275.0f, 425.0f, "Presisone o Botao Esquerdo do Mouse para comecar um novo jogo!");
+            }
+            else {
+                drawText(450.0f, 400.0f, "Jogo Pausado!");
+                drawText(275.0f, 425.0f, "Presisone o Botao Esquerdo do Mouse para Despausar!");
+            }
         }
     }
 }
@@ -287,8 +334,17 @@ void Breakout::activeMouse(int button, int state, int x, int y) {
             if (this->state == 2) {
                 init();
             }
-            else {
-                this->gamePaused = false;
+            else if (this->changingLevels) { //Se estiver realizando uma transição de Fase
+                if (this->levelNumber == this->qntLevels) { //Se essa for a fase Final, acaba o Jogo
+                    this->gameEnd = true;
+                    this->changingLevels = false;
+                } else {  //Se não
+                    this->levelNumber++; //Aumenta o numero do Level Atual
+                    initLevel(); //Carrega o Level Novamente
+                    this->changingLevels = false; //Encerra a transição de Fase
+                }
+            } else { //Se não estiver realizando transição de Fase
+                if(!this->gameEnd) this->gamePaused = false; //Despauza o jogo se ele ainda não tiver acabado
                 std::cout << "RESUME GAME" << std::endl;
             }
             break;

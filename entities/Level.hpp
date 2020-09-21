@@ -8,6 +8,7 @@
 
 class Level {
 public:
+    int liveBricks;
     std::string layout;
     std::vector<Brick*> bricks;
     Level();

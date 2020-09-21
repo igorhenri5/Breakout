@@ -10,8 +10,8 @@
 
 class Breakout{
     public:
-        int state, score;
-        bool gamePaused;
+        int state, score, qntLevels, levelNumber;
+        bool gamePaused, changingLevels, gameEnd;
         int width, height;
         int ballCount;
         GLfloat mouseX;
