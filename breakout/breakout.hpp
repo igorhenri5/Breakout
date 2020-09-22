@@ -4,22 +4,22 @@
 #include "../entities/ball.hpp"
 #include "../entities/paddle.hpp"
 #include "../entities/level.hpp"
-#include "../entities/message.hpp"
+#include "../util/message.hpp"
 
 #define FRAMETIME 1000/60
 
 class Breakout{
     public:
-        int state, score, qntLevels, levelNumber;
         bool gamePaused, changingLevels, gameEnd;
+        int state, score, qntLevels, levelNumber;
         int width, height;
         int ballCount;
         GLfloat mouseX;
         Paddle* paddle;
         Ball* ball;
-        // std::vector<Ball*> balls;
         Level* currentLevel;
         std::vector<Message*> messages;
+
         Breakout();
         Breakout(int, int);
 

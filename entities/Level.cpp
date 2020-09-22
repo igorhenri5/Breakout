@@ -6,9 +6,6 @@ Level::Level() {
 Level::Level(std::string layout) {
     this->liveBricks = 0;
     this->layout = layout;
-    // int brickWidth = 90;
-    // int brickHeight = 45;
-    // int spacing = 5;
     int brickWidth = 45;
     int brickHeight = 23;
     float spacing = 2.5f;
@@ -21,7 +18,7 @@ Level::Level(std::string layout) {
         }else if(c>= 48 && c<= 53){
             bricks.push_back(new Brick(row * (brickWidth+2*spacing) + spacing, col * (brickHeight+2*spacing), brickWidth, brickHeight, c-48));
                 row++;
-                if (c != 53 && c != 48) this->liveBricks++; //Se não for do tipo 0 ou 5 (Caracter 53 - Número 5) incrementa a quantidade de tijolos "vivos"
+                if (c != 53 && c != 48) this->liveBricks++; //Se nï¿½o for do tipo 0 ou 5 (Caracter 53 - Nï¿½mero 5) incrementa a quantidade de tijolos "vivos"
         }
     }
 }

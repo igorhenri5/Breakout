@@ -25,7 +25,6 @@ void Breakout::init(){
     this->changingLevels = false;
     this->gameEnd = false;
     initPaddle();
-    //initBricks();
     initBall();
     initLevel();
     mouseX = 0.0f;
@@ -58,9 +57,8 @@ void Breakout::display(){
             if (!this->gamePaused) {
                 update();
             }
-            // draw();
             break;
-        case 2: //perdi KK
+        case 2: //game over
             draw();
             if (!this->gamePaused) {
                 update();
@@ -93,6 +91,7 @@ GLfloat paddleVelocity(GLfloat pX, GLfloat wX, GLfloat pWidth, GLfloat wWidth){
     return vel;
 }
 
+//Movimento & Colisões
 void Breakout::update(){
 //Movimento
     //mover bola
@@ -124,7 +123,6 @@ void Breakout::update(){
         }
 
     //colisão da bola com os tijolos  
-
         for (std::vector<Brick*>::iterator it = currentLevel->bricks.begin(); it != currentLevel->bricks.end(); ++it){
             int hit = 0;
             if ((*it)->tangivel){
@@ -202,7 +200,6 @@ void Breakout::update(){
 
 void Breakout::initPaddle(){
     paddle = new Paddle(((float)width-200)/2,(float)height*0.9, 200.0f,10.0f);
-    // paddle = new Paddle(0,height, 200.0f,10.0f);
 }
 
 void Breakout::initBall(){
@@ -213,7 +210,7 @@ void Breakout::initLevel() { //Inicia o Level
     // std::string layout = "1110220111|1002222001|1011221101|1001221001"; //Especifica quais os tipos de Tijolo fazem parte do Level
     // std::string layout = "11102201111110220111|10022220011002222001|10112211011011221101|10012210011001221001"; //Especifica quais os tipos de Tijolo fazem parte do Level
     // std::string layout = "11102201111110220111|10022220011002222001|10112211011011221101|10012210011001223451"; //Especifica quais os tipos de Tijolo fazem parte do Level
-    std::string layout1 = "00000000111100000000|11111000444000011111";
+    std::string layout1 = "00000000111100000000|11111000444400011111";
     std::string layout2 = "00000221555112200000|10033224444442233000";
     
     std::cout << "Loading Level: " << this->levelNumber << std::endl;
@@ -327,6 +324,9 @@ void Breakout::gameInfo() {
     std::cout << "VelY: " << ball->velY << std::endl;
 }
 
+
+//Handle de eventos de Mouse & Teclado
+
 void Breakout::activeMouse(int button, int state, int x, int y) {
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
         switch (this->gamePaused) {
@@ -363,10 +363,6 @@ void Breakout::activeMouse(int button, int state, int x, int y) {
 }
 
 void Breakout::passiveMouse(int x, int y) {
-    char buffer[64];
-    snprintf(buffer, sizeof(buffer), "%d", x);
-    glutSetWindowTitle(buffer);
-
     this->mouseX = (GLfloat)x;
 }
 

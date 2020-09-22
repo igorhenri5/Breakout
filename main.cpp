@@ -1,13 +1,6 @@
 #include <iostream>
 #include <vector>
-#include <utility>
-#include <time.h>
-#include <chrono>
-#include <sys/time.h>
 #include <string>
-#include <cstdlib>
-#include <iomanip>
-#include <string> 
 #include <GL/freeglut.h>
 
 #include "breakout/breakout.hpp"
@@ -17,18 +10,11 @@
 
 Breakout breakout(WIDTHPX,HEIGHTPX);
 
-struct timeval tempoInicial, tempoFinal;
-
-int mouse_x, mouse_y;
-char buffer[64];
-
 void activeMouse(int button, int state, int x, int y){
 	breakout.activeMouse(button, state, x, y);
 }
 
 void passiveMouse(int x, int y){
-    mouse_x = x; 
-    mouse_y = y;
     breakout.passiveMouse(x, y);
 }
 
@@ -40,17 +26,8 @@ void specialActiveKeyboard(int key, int x, int y){
 	breakout.specialActiveKeyboard(key, x, y);
 }
 
-void update(){   
-}
-
 void display(){
     breakout.display();
-}
-
-void mainloop(){
-}
-
-void onClose(){
 }
 
 void initOpenGLEnvironment(int width, int height){
@@ -70,7 +47,6 @@ int main(int argc, char **argv){
     glutInitWindowPosition(200, 200);
     glutCreateWindow("Breakout");
 
-    // glewInit();
     initOpenGLEnvironment(WIDTHPX,HEIGHTPX);
 
     glutDisplayFunc(display);
@@ -79,8 +55,6 @@ int main(int argc, char **argv){
 	glutKeyboardFunc(activeKeyboard);
 	glutSpecialFunc(specialActiveKeyboard);
 
-    // glutIdleFunc(mainloop);
-    glutCloseFunc(onClose);
     glutMainLoop();
 
     return 0;
