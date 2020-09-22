@@ -16,7 +16,7 @@ Breakout::Breakout(int width, int height){
 }
 
 void Breakout::init(){
-    this->qntLevels = 2;
+    this->qntLevels = 4;
     this->levelNumber = 1;
     this->ballCount = 3;
     this->state = 0;
@@ -212,23 +212,28 @@ void Breakout::initBall(){
 }
 
 void Breakout::initLevel() { //Inicia o Level 
-    // std::string layout = "1110220111|1002222001|1011221101|1001221001"; //Especifica quais os tipos de Tijolo fazem parte do Level
-    // std::string layout = "11102201111110220111|10022220011002222001|10112211011011221101|10012210011001221001"; //Especifica quais os tipos de Tijolo fazem parte do Level
-    // std::string layout = "11102201111110220111|10022220011002222001|10112211011011221101|10012210011001223451"; //Especifica quais os tipos de Tijolo fazem parte do Level
+
     std::string layout1 = "00000000111100000000|11111000444400011111";
     std::string layout2 = "00000221555112200000|10033224444442233000";
+    std::string layout3 = "03300333033303300333|10000101010101010101|10110101011001010101|10010101010101010101|01100111010101100111";
+    std::string layout4 = "03300022011022000330|10023320011002332001|00000000000000000000|30012000555500021003";
     
     std::cout << "Loading Level: " << this->levelNumber << std::endl;
     
-    switch (this->levelNumber) {
-    case 1:
-        currentLevel = new Level(layout1);
-        break;
-    case 2:
-        currentLevel = new Level(layout2);
-        break;
+    switch(this->levelNumber){
+        case 1:
+            currentLevel = new Level(layout1);
+            break;
+        case 2:
+            currentLevel = new Level(layout2);
+            break;
+        case 3:
+            currentLevel = new Level(layout3);
+            break;
+        case 4:
+            currentLevel = new Level(layout4);
+            break;
     }
-
 }
 
 void Breakout::drawPaddle(){
@@ -370,9 +375,10 @@ void Breakout::activeMouse(int button, int state, int x, int y) {
     }
 
     if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
-        this->gamePaused = true;
-        this->state = 3;
-        // gameInfo();
+        if(this->state != 2){ //desabilita debug em caso de game over
+            this->gamePaused = true;
+            this->state = 3;
+        }
     }
 }
 
