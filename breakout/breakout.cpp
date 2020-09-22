@@ -63,7 +63,12 @@ void Breakout::display(){
             if (!this->gamePaused) {
                 update();
             }
-            break;                
+            break;
+        case 3: //debug
+            draw();
+            update();
+            gameInfo();
+            this->state = 1;
         default:
             break;
     }
@@ -322,6 +327,14 @@ void Breakout::gameInfo() {
     std::cout << "PosY: " << ball->y << std::endl;
     std::cout << "VelX: " << ball->velX << std::endl;
     std::cout << "VelY: " << ball->velY << std::endl;
+    std::cout << "------ BRICKS ------" << std::endl;
+    int k = 0;
+    for(std::vector<Brick*>::iterator it = currentLevel->bricks.begin(); it != currentLevel->bricks.end(); ++it ,k++){
+        (*it)->drawBrick();
+        if((*it)->type != 0){
+            std::cout << "ACTIVE BRICK [" << k << "] PosX:" << (*it)->x << " PosY:" << (*it)->y << " Type:" << (*it)->type << " HP:" << (*it)->hp << std::endl;
+        }
+    }
 }
 
 
@@ -358,7 +371,8 @@ void Breakout::activeMouse(int button, int state, int x, int y) {
 
     if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN) {
         this->gamePaused = true;
-        gameInfo();
+        this->state = 3;
+        // gameInfo();
     }
 }
 
