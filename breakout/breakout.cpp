@@ -131,10 +131,10 @@ void Breakout::update(){
         for (std::vector<Brick*>::iterator it = currentLevel->bricks.begin(); it != currentLevel->bricks.end(); ++it){
             int hit = 0;
             if ((*it)->tangivel){
-                if( this->ball->x > (*it)->x - this->ball->radius &&
-                    this->ball->x < (*it)->x + (*it)->width + this->ball->radius &&
-                    this->ball->y > (*it)->y - this->ball->radius &&
-                    this->ball->y < (*it)->y + (*it)->height + this->ball->radius){
+                if( this->ball->x > (*it)->x - (this->ball->radius + this->ball->velX)  &&
+                    this->ball->x < (*it)->x + (*it)->width + (this->ball->radius - this->ball->velX) &&
+                    this->ball->y > (*it)->y - (this->ball->radius + this->ball->velY) &&
+                    this->ball->y < (*it)->y + (*it)->height + (this->ball->radius - this->ball->velY)){
                     
                     if( this->ball->y + this->ball->radius > (*it)->y &&
                         this->ball->y < (*it)->y + (*it)->height - this->ball->radius){
@@ -212,7 +212,7 @@ void Breakout::initBall(){
 }
 
 void Breakout::initLevel() { //Inicia o Level 
-
+    initBall();
     std::string layout1 = "00000000111100000000|11111000444400011111";
     std::string layout2 = "00000221555112200000|10033224444442233000";
     std::string layout3 = "03300333033303300333|10000101010101010101|10110101011001010101|10010101010101010101|01100111010101100111";
@@ -288,9 +288,9 @@ void Breakout::draw(){
     drawPaddle();
     drawBricks();
     drawBall();
-    // drawText(10.0f, 25.0f, "Score: " + std::to_string(this->score)); //Desenha o Score
-    // drawText(120.0f, 25.0f, "Vidas: " + std::to_string(this->ballCount)); //Desenha a quantidade de Bolotas
-    // drawText(220.0f, 25.0f, "Tijolos Restantes: " + std::to_string(this->currentLevel->liveBricks)); //Desenha a quantidade de Bolotas
+    drawText(10.0f, 25.0f, "Score: " + std::to_string(this->score)); //Desenha o Score
+    drawText(120.0f, 25.0f, "Vidas: " + std::to_string(this->ballCount)); //Desenha a quantidade de Bolotas
+    drawText(220.0f, 25.0f, "Tijolos Restantes: " + std::to_string(this->currentLevel->liveBricks)); //Desenha a quantidade de Bolotas
     drawMessages();
     
     if(this->gamePaused){ //Se o jogo estiver pausado, informa o jogador
