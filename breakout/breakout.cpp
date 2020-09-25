@@ -188,12 +188,12 @@ void Breakout::update(){
 
     //colisão com as bordas da tela
         //esquerda-direita
-        if( (this->ball->x <= (2*this->ball->radius)) || 
-            (this->ball->x >= (this->width - 2*this->ball->radius))){
+        if( (this->ball->x < (-this->ball->velX+this->ball->radius)) || 
+            (this->ball->x >= (this->width - (this->ball->velX+this->ball->radius)))){
             this->ball->velX *= -1;
         }
         //cima
-        if((this->ball->y <= (2*this->ball->radius))){
+        if((this->ball->y <= (-this->ball->velY+this->ball->radius))){
             this->ball->velY *= -1;
         }
         //baixo
@@ -288,9 +288,9 @@ void Breakout::draw(){
     drawPaddle();
     drawBricks();
     drawBall();
-    drawText(10.0f, 25.0f, "Score: " + std::to_string(this->score)); //Desenha o Score
-    drawText(120.0f, 25.0f, "Vidas: " + std::to_string(this->ballCount)); //Desenha a quantidade de Bolotas
-    drawText(220.0f, 25.0f, "Tijolos Restantes: " + std::to_string(this->currentLevel->liveBricks)); //Desenha a quantidade de Bolotas
+    // drawText(10.0f, 25.0f, "Score: " + std::to_string(this->score)); //Desenha o Score
+    // drawText(120.0f, 25.0f, "Vidas: " + std::to_string(this->ballCount)); //Desenha a quantidade de Bolotas
+    // drawText(220.0f, 25.0f, "Tijolos Restantes: " + std::to_string(this->currentLevel->liveBricks)); //Desenha a quantidade de Bolotas
     drawMessages();
     
     if(this->gamePaused){ //Se o jogo estiver pausado, informa o jogador
